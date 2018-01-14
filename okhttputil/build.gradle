@@ -35,5 +35,5 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.github.LiXiangABC:QuickCache:latest.release'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-    compile files('libs/KJFrameForAndroid_v2.223.jar')
+    implementation files('libs/KJFrameForAndroid_v2.223.jar')
 }

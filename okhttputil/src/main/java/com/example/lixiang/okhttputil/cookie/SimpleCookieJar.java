@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.example.lixiang.okhttputil.Bean.CookieListBean;
+import com.example.lixiang.okhttputil.utils.ToastUtil;
 import com.google.gson.Gson;
 
 import org.kymjs.kjframe.utils.PreferenceHelper;
@@ -61,17 +62,23 @@ public final class SimpleCookieJar implements CookieJar {
          if (s != null) {
              s = s.trim();
              CookieListBean cookieListBean = new Gson().fromJson(s, CookieListBean.class);
-             for (CookieListBean.CookieBean cookieBean : cookieListBean.getChannels()) {
-                 Cookie.Builder builder = new Cookie.Builder();
-                 builder.name(cookieBean.getName());
+             try {
+                 for (CookieListBean.CookieBean cookieBean : cookieListBean.getChannels()) {
+                     Cookie.Builder builder = new Cookie.Builder();
+                     builder.name(cookieBean.getName());
 
-                 builder.value(cookieBean.getValue());
-                 builder.expiresAt(cookieBean.getExpiresAt());
-                 builder.domain(cookieBean.getDomain());
-                 builder.path(cookieBean.getPath());
-                 Cookie build = builder.build();
+                     builder.value(cookieBean.getValue());
+                     builder.expiresAt(cookieBean.getExpiresAt());
+                     builder.domain(cookieBean.getDomain());
+                     builder.path(cookieBean.getPath());
+                     Cookie build = builder.build();
 //                         allCookies.clear();
-                 allCookies.add(build);
+                     allCookies.add(build);
+                 }
+
+             }catch (Exception e){
+                 PreferenceHelper.remove(context, "isLogin", "isLogin");
+                 ToastUtil.showToast(context,"身份验证有误，请重新登录");
              }
          }
 
