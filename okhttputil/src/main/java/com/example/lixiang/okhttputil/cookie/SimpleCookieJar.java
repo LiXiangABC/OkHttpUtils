@@ -44,45 +44,49 @@ public final class SimpleCookieJar implements CookieJar {
                 cookieBean.setDomain(c.domain());
                 cookieBean.setPath(c.path());
                 cookielist.add(cookieBean);
-//                strBudilder.append(c.path() + "^");
-//                strBudilder.append(c.secure() + "^");
-//                strBudilder.append(c.hostOnly() + "^");
-//                strBudilder.append(c.persistent() + "^");
-//                strBudilder.append("#");
             }
                 String Str_cookieBean = new Gson().toJson(cookieListBean);
             PreferenceHelper.write(context, "isLogin", "isLogin", Str_cookieBean);
         }
     }
 
+    /**@author LiXiang create at 2018/1/29 14:48*/
+    /**Explain : 获取当前的cookie
+     *
+     * @param context Context
+     * @return
+     */
+    public static List<Cookie> getCookie(Context context){
+        List<Cookie> allCookies = new ArrayList<>();
+        String s = PreferenceHelper.readString(context, "isLogin", "isLogin");
+        if (s != null) {
+            s = s.trim();
+            CookieListBean cookieListBean = new Gson().fromJson(s, CookieListBean.class);
+            try {
+                for (CookieListBean.CookieBean cookieBean : cookieListBean.getChannels()) {
+                    Cookie.Builder builder = new Cookie.Builder();
+                    builder.name(cookieBean.getName());
+
+                    builder.value(cookieBean.getValue());
+                    builder.expiresAt(cookieBean.getExpiresAt());
+                    builder.domain(cookieBean.getDomain());
+                    builder.path(cookieBean.getPath());
+                    Cookie build = builder.build();
+//                         allCookies.clear();
+                    allCookies.add(build);
+                }
+
+            }catch (Exception e){
+                PreferenceHelper.remove(context, "isLogin", "isLogin");
+                ToastUtil.showToast(context,"身份验证有误，请重新登录");
+            }
+        }
+        return allCookies;
+    }
+
     @Override
     public synchronized List<Cookie> loadForRequest(HttpUrl url) {
-    	 List<Cookie> allCookies = new ArrayList<>();
-         String s = PreferenceHelper.readString(context, "isLogin", "isLogin");
-         if (s != null) {
-             s = s.trim();
-             CookieListBean cookieListBean = new Gson().fromJson(s, CookieListBean.class);
-             try {
-                 for (CookieListBean.CookieBean cookieBean : cookieListBean.getChannels()) {
-                     Cookie.Builder builder = new Cookie.Builder();
-                     builder.name(cookieBean.getName());
-
-                     builder.value(cookieBean.getValue());
-                     builder.expiresAt(cookieBean.getExpiresAt());
-                     builder.domain(cookieBean.getDomain());
-                     builder.path(cookieBean.getPath());
-                     Cookie build = builder.build();
-//                         allCookies.clear();
-                     allCookies.add(build);
-                 }
-
-             }catch (Exception e){
-                 PreferenceHelper.remove(context, "isLogin", "isLogin");
-                 ToastUtil.showToast(context,"身份验证有误，请重新登录");
-             }
-         }
-
-
+    	 List<Cookie> allCookies = getCookie(context);
 //         访问网络，先访问本地
          List<Cookie> result = new ArrayList<>();
 
