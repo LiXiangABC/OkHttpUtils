@@ -62,7 +62,7 @@ public final class SimpleCookieJar implements CookieJar {
         if (s != null) {
             s = s.trim();
             CookieListBean cookieListBean = new Gson().fromJson(s, CookieListBean.class);
-            try {
+//            try {
                 for (CookieListBean.CookieBean cookieBean : cookieListBean.getChannels()) {
                     Cookie.Builder builder = new Cookie.Builder();
                     builder.name(cookieBean.getName());
@@ -76,10 +76,10 @@ public final class SimpleCookieJar implements CookieJar {
                     allCookies.add(build);
                 }
 
-            }catch (Exception e){
-                PreferenceHelper.remove(context, "isLogin", "isLogin");
-                ToastUtil.showToast(context,"身份验证有误，请重新登录");
-            }
+//            }catch (Exception e){
+//                PreferenceHelper.remove(context, "isLogin", "isLogin");
+//                ToastUtil.showToast(context,"身份验证有误，请重新登录");
+//            }
         }
         return allCookies;
     }
