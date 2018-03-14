@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.example.lixiang.okhttputil.Bean.CookieListBean;
+import com.example.lixiang.okhttputil.OkHttpUtils;
 import com.example.lixiang.okhttputil.utils.ToastUtil;
 import com.google.gson.Gson;
 
@@ -30,7 +31,7 @@ public final class SimpleCookieJar implements CookieJar {
         allCookies.addAll(cookies);
         //先查询是否存在cookie  如果存在则不覆盖，不存在则覆盖
         //获取本地的cookie
-        String s = PreferenceHelper.readString( context, "isLogin", "isLogin");
+        String s = OkHttpUtils.getCookie();
         if (TextUtils.isEmpty(s)) {
 //            StringBuilder strBudilder = new StringBuilder();
                 CookieListBean cookieListBean = new CookieListBean();
@@ -46,7 +47,7 @@ public final class SimpleCookieJar implements CookieJar {
                 cookielist.add(cookieBean);
             }
                 String Str_cookieBean = new Gson().toJson(cookieListBean);
-            PreferenceHelper.write(context, "isLogin", "isLogin", Str_cookieBean);
+            OkHttpUtils.setCookie(Str_cookieBean);
         }
     }
 
@@ -58,11 +59,12 @@ public final class SimpleCookieJar implements CookieJar {
      */
     public static List<Cookie> getCookie(Context context){
         List<Cookie> allCookies = new ArrayList<>();
-        String s = PreferenceHelper.readString(context, "isLogin", "isLogin");
+        String s = OkHttpUtils.getCookie();
+
         if (s != null) {
             s = s.trim();
             CookieListBean cookieListBean = new Gson().fromJson(s, CookieListBean.class);
-//            try {
+            try {
                 for (CookieListBean.CookieBean cookieBean : cookieListBean.getChannels()) {
                     Cookie.Builder builder = new Cookie.Builder();
                     builder.name(cookieBean.getName());
@@ -76,10 +78,10 @@ public final class SimpleCookieJar implements CookieJar {
                     allCookies.add(build);
                 }
 
-//            }catch (Exception e){
-//                PreferenceHelper.remove(context, "isLogin", "isLogin");
-//                ToastUtil.showToast(context,"身份验证有误，请重新登录");
-//            }
+            }catch (Exception e){
+                PreferenceHelper.remove(context, "isLogin", "isLogin");
+                ToastUtil.showToast(context,"身份验证有误，请重新登录");
+            }
         }
         return allCookies;
     }

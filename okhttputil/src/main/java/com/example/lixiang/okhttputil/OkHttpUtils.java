@@ -210,6 +210,21 @@ public class OkHttpUtils
         });
     }
 
+
+    /**        Explain : 对外提供数据返回cookie是否存在问题的检测接口
+    * @author LiXiang create at 2018/3/14 16:04*/
+    public  interface checkCookieListener{
+     /**@author LiXiang create at 2018/3/14 16:08*/
+        /**Explain :
+         * @param object ：服务器返回数据
+         * @return 当正确返回true，反则反之。
+         */
+        public  boolean chekCookie(Object object );
+    }
+
+
+    public checkCookieListener chekCookie;
+
     public void sendSuccessResultCallback(final Object object, final Callback callback, LoadingCacheStringBean loadingCacheString, boolean isOpenCache)
     {
         if (callback == null) return;
@@ -218,13 +233,22 @@ public class OkHttpUtils
             @Override
             public void run()
             {
-                    if(object != null &&object.toString().contains("{\"code\":\"604\"")){
+//                    if(object != null &&object.toString().contains("{\"code\":\"604\"")){
+                    if(object != null ){
 //                EventBus.getDefault().post(new LoginBean("1"));
-                        PreferenceHelper.remove(context, "isLogin", "isLogin");
-                        PreferenceHelper.remove(context, "LoginInfo", "Info");
-                        ToastUtil.showToast(context,"身份验证过期，请重新登录");
+//                        PreferenceHelper.remove(context, "isLogin", "isLogin");
+//                        PreferenceHelper.remove(context, "LoginInfo", "Info");
+//                        ToastUtil.showToast(context,"身份验证过期，请重新登录");
+                        /**        Explain : 当存在chekCookie检测监听，则进行检测
+                         * @author LiXiang create at 2018/3/14 15:58*/
+                        if (chekCookie != null) {
+                            if (chekCookie.chekCookie(object) == false) {
+                                return;//当cookie存在异常或未存在，则后面不进行数据处理
+                            }
+                        }
 
-                }else {
+//                }else
+//                    {
                 callback.onResponse(object);
                         /**        Explain : 当只有返回的数据不为空，并且打开了缓存的时候才向本地写入
                          * @author LiXiang create at 2017/11/20 15:58*/
@@ -287,9 +311,20 @@ public class OkHttpUtils
     public  static  Context getContext(){
      return context;
     }
-    
-    
-    
+
+    public  static  void setCookie(String cookie){
+        PreferenceHelper.write(context, "isLogin", "isLogin", cookie);
+        System.out.println("OkHttpUtils-setCookie");
+    }
+    public  static  String getCookie(){
+        System.out.println("OkHttpUtils-getCookie");
+        return  PreferenceHelper.readString(context, "isLogin", "isLogin");
+    }
+    public  static  void removeCookie(){
+        System.out.println("OkHttpUtils-removeCookie");
+        PreferenceHelper.remove(context, "isLogin", "isLogin");
+    }
+
     
 }
 
