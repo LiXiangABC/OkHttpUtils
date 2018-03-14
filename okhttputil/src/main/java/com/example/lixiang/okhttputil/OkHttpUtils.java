@@ -233,12 +233,7 @@ public class OkHttpUtils
             @Override
             public void run()
             {
-//                    if(object != null &&object.toString().contains("{\"code\":\"604\"")){
                     if(object != null ){
-//                EventBus.getDefault().post(new LoginBean("1"));
-//                        PreferenceHelper.remove(context, "isLogin", "isLogin");
-//                        PreferenceHelper.remove(context, "LoginInfo", "Info");
-//                        ToastUtil.showToast(context,"身份验证过期，请重新登录");
                         /**        Explain : 当存在chekCookie检测监听，则进行检测
                          * @author LiXiang create at 2018/3/14 15:58*/
                         if (chekCookie != null) {
@@ -247,8 +242,6 @@ public class OkHttpUtils
                             }
                         }
 
-//                }else
-//                    {
                 callback.onResponse(object);
                         /**        Explain : 当只有返回的数据不为空，并且打开了缓存的时候才向本地写入
                          * @author LiXiang create at 2017/11/20 15:58*/
