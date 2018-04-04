@@ -144,23 +144,15 @@ public class OkHttpUtils
             callback = Callback.CALLBACK_DEFAULT;
         final Callback finalCallback = callback;
 
-//        final int[] serversLoadTimes = {0}; //当前的重连次数
 
         requestCall.getCall().enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
                 call.cancel();
                 if (e.toString().contains("TimeoutException")) {
-                    //如果超时并未超过指定次数，则重新连接
-//                    if(serversLoadTimes[0] <maxLoadTimes){
-//                        serversLoadTimes[0]++;
-//                        LogSwitchUtils.Log("onFailure 当前正在重连",serversLoadTimes[0]+"");
-//                        OkHttpUtils.getInstance().getOkHttpClient().newBuimylder().build().newCall(requestCall.getRequest()).enqueue(this);
-//                    }else {
                         new Handler(Looper.getMainLooper()).post(()->{
                             ToastUtil.showToast(context, "连接超时,请重新操作");});
                         sendFailResultCallback(call, e, finalCallback);
-//                    }
                 }else {
                     if (e.toString().contains("No address associated with hostname")) {
                         new Handler(Looper.getMainLooper()).post(()->{ToastUtil.showToast(context, "当前无网络，请重新连接");});
@@ -234,6 +226,7 @@ public class OkHttpUtils
             public void run()
             {
                     if(object != null ){
+                        System.out.println("sendSuccessResultCallback OK");
                         /**        Explain : 当存在chekCookie检测监听，则进行检测
                          * @author LiXiang create at 2018/3/14 15:58*/
                         if (chekCookie != null) {
@@ -311,7 +304,7 @@ public class OkHttpUtils
     }
     public  static  String getCookie(){
         System.out.println("OkHttpUtils-getCookie");
-        return  PreferenceHelper.readString(context, "isLogin", "isLogin");
+        return  PreferenceHelper.readString(context, "isLogin", "isLogin",null);
     }
     public  static  void removeCookie(){
         System.out.println("OkHttpUtils-removeCookie");
