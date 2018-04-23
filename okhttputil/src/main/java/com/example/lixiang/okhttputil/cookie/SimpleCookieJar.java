@@ -80,7 +80,7 @@ public final class SimpleCookieJar implements CookieJar {
 
             }catch (Exception e){
                 PreferenceHelper.remove(context, "isLogin", "isLogin");
-                ToastUtil.showToast(context,"身份验证有误，请重新登录");
+//                ToastUtil.showToast(context,"身份验证有误，请重新登录");
             }
         }
         return allCookies;
