@@ -1,4 +1,8 @@
 # OkHttpUtils
 okhttp网络访问框架封装
-#### 更新日志
-- 在文件下载回调FileCallBack中新增断点续传功能（18.4.4）
+### 更新日志
+#### 18.5.23
+- 将保存断点下载信息的Preferences从FileCallBack中剥离
+- 优化断点续传逻辑结构
+#### 18.4.4
+- 在文件下载回调FileCallBack中新增断点续传功能
