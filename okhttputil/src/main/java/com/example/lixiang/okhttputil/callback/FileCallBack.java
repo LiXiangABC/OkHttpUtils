@@ -4,6 +4,7 @@ package com.example.lixiang.okhttputil.callback;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.lixiang.okhttputil.OkHttpUtils;
 import com.example.lixiang.okhttputil.utils.L;
@@ -23,6 +24,7 @@ import okhttp3.Response;
  */
 public abstract class FileCallBack extends Callback<File>
 {
+    private static String TAG = "FileCallBack";
     ;
     /**
      * 目标文件存储的文件夹路径
@@ -36,9 +38,7 @@ public abstract class FileCallBack extends Callback<File>
 
     /**        Explain : 断点续传中，读取保存在SharedPreferences文件中当前文件的保存信息
     * @author LiXiang create at 2018/3/30 16:23*/
-    private  String addFileName = null;
-    private  String addFileTotal = null;
-    private  String addFileSum = null;
+    private  long addFileCurrentSum = -1 ;
 
     public abstract void inProgress(float progress);
     public void inProgress(long total,long sum,float progress){
@@ -51,20 +51,18 @@ public abstract class FileCallBack extends Callback<File>
         this.destFileName = destFileName;
     }
 
-    public FileCallBack(String destFileDir, String destFileName,String addFileName,String addFileTotal,String addFileSum)
+    public FileCallBack(String destFileDir, String destFileName,long addFileCurrentSum)
     {
         this.destFileDir = destFileDir;
         this.destFileName = destFileName;
-        this.addFileName = addFileName;
-        this.addFileTotal = addFileTotal;
-        this.addFileSum = addFileSum;
+        this.addFileCurrentSum = addFileCurrentSum;
     }
 
 
     @Override
     public File parseNetworkResponse(Response response) throws Exception
     {
-        return (addFileName== null && addFileTotal== null&& addFileSum== null) ? saveFile(response):saveAddFile(response) ;
+        return (addFileCurrentSum == -1 ) ? saveFile(response):saveAddFile(response) ;
     }
 
 
@@ -89,9 +87,9 @@ public abstract class FileCallBack extends Callback<File>
                 sum += len;
                 fos.write(buf, 0, len);
                 final long finalSum = sum;
-                System.out.println("Progress total:"+total);
-                System.out.println("Progress finalSum:"+finalSum);
-                System.out.println("Progress nowSum:"+finalSum * 1.0f / total);
+                Log.i(TAG,"Progress total:"+total);
+                Log.i(TAG,"Progress finalSum:"+finalSum);
+                Log.i(TAG,"Progress nowSum:"+finalSum * 1.0f / total);
                 OkHttpUtils.getInstance().getDelivery().post(new Runnable()
                 {
                     @Override
@@ -147,12 +145,8 @@ public abstract class FileCallBack extends Callback<File>
         int len = 0;
         File file = createFile();
         is = response.body().byteStream();
-        final long total = response.body().contentLength();
-        if (getPreferences(addFileName, addFileSum) == 0) {
-        savePreferences(addFileName,addFileTotal,total);
-        }
-        long sum = 0;
-        long tempPreferencesSum  = getPreferences(addFileName, addFileSum);
+        final long total = response.body().contentLength()+addFileCurrentSum;
+
         try {
             // 打开一个随机访问文件流，按读写方式
             randomFile = new RandomAccessFile(file, "rw");
@@ -160,34 +154,27 @@ public abstract class FileCallBack extends Callback<File>
             long fileLength = randomFile.length();
             // 将写文件指针移到文件尾。
 //            randomFile.seek(fileLength);
-            System.out.println("downloadImage fileLength:"+fileLength);
-            System.out.println("downloadImage getPreferences:"+getPreferences(addFileName,addFileSum));
-            randomFile.seek(getPreferences(addFileName,addFileSum));
-//            =============测试获取本地保存的角标
+            Log.i(TAG,"downloadImage fileLength:"+fileLength);
+            randomFile.seek(addFileCurrentSum);
             while ((len = is.read(buf)) != -1)
             {
-                sum += len;
+                addFileCurrentSum += len;
                 randomFile.write(buf, 0, len);
-                final long finalSum = sum;
-                System.out.println("getPreferences:  "+getPreferences(addFileName,addFileSum));
-                System.out.println("Progress total:"+total);
-                System.out.println("Progress finalSum:"+finalSum);
-                System.out.println("Progress nowSum:"+finalSum * 1.0f / total);
+                Log.i(TAG,"Progress total:"+total);
+                Log.i(TAG,"Progress finalSum:"+addFileCurrentSum);
+                Log.i(TAG,"Progress nowSum:"+addFileCurrentSum * 1.0f / total);
                 OkHttpUtils.getInstance().getDelivery().post(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        inProgress(total,finalSum,finalSum * 1.0f / total);
+                        inProgress(total,addFileCurrentSum,addFileCurrentSum * 1.0f / total);
                     }
                 });
             }
-            final long finalTempPreferencesSum = sum+tempPreferencesSum;
-            savePreferences(addFileName,addFileSum,finalTempPreferencesSum);
         } catch (IOException e) {
             e.printStackTrace();
-            final long finalTempPreferencesSum = sum+tempPreferencesSum;
-            savePreferences(addFileName,addFileSum,finalTempPreferencesSum);
+            inProgress(total,addFileCurrentSum,addFileCurrentSum * 1.0f / total);
         } finally{
             if(randomFile != null){
                 try {
@@ -206,21 +193,4 @@ public abstract class FileCallBack extends Callback<File>
         }
         return file;
     }
-
-
-    public static void savePreferences(String name,String key,long value) {
-        SharedPreferences preferences = OkHttpUtils.getContext().getSharedPreferences(name, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putLong(key, value);
-        editor.commit();
-    }
-
-
-    public static long getPreferences(String name,String key){
-        SharedPreferences preferences = OkHttpUtils.getContext().getSharedPreferences(name, Context.MODE_PRIVATE);
-        return preferences.getLong(key, 0);
-    }
-
-
-
 }
