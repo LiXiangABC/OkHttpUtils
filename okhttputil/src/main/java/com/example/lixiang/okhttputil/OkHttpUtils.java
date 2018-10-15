@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -165,6 +166,9 @@ public class OkHttpUtils
             Map.Entry<String, String> en = ite.next();
             String key = en.getKey();
             String value = en.getValue();
+            if (targetMap == null) {
+                targetMap  = new LinkedHashMap<String, String>();
+            }
             targetMap.put(key,value);
         }
         }
