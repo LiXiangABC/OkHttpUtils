@@ -25,7 +25,9 @@ import org.kymjs.kjframe.utils.PreferenceHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
@@ -110,10 +112,10 @@ public class OkHttpUtils
 
     public static GetBuilder get()
     {
-        return new GetBuilder().headers(heardsMap).params(paramsMap);
+        return new GetBuilder();
     }//当前指定为2.36版本
 
-    public static DeleteBuilder delete() {return new DeleteBuilder().headers(heardsMap).params(paramsMap);}//当前指定为2.36版本
+    public static DeleteBuilder delete() {return new DeleteBuilder();}//当前指定为2.36版本
 
     public static PostStringBuilder postString()
     {
@@ -127,7 +129,7 @@ public class OkHttpUtils
 
     public static PostFormBuilder post()
     {
-        return new PostFormBuilder().headers(heardsMap).params(paramsMap);//当前指定为2.36版本
+        return new PostFormBuilder();//当前指定为2.36版本
     }
 
     public static Map<String, String> heardsMap;
@@ -143,6 +145,33 @@ public class OkHttpUtils
     public static void setCommonParams(Map<String, String> params){
         paramsMap = params;
     }
+
+    /**        Explain : 获取公共请求头
+    * @author LiXiang create at 2018/10/15 15:01*/
+    public static Map getCommonHeards(){return heardsMap;}
+
+    /**        Explain : 获取公共请求参数
+    * @author LiXiang create at 2018/10/15 15:01*/
+    public static Map getCommonParams(){return paramsMap;}
+
+    /**        Explain : 将参数写入指定集合
+    * @author LiXiang create at 2018/10/15 14:57*/
+    public static Map joinMap(Map<String, String> targetMap,Map<String, String> dataMap){
+        if (dataMap != null) {
+        //使用 entrySet()遍历集合
+        Set<Map.Entry<String,String>> entry = dataMap.entrySet();
+        Iterator<Map.Entry<String,String>> ite = entry.iterator();
+        while(ite.hasNext()) {
+            Map.Entry<String, String> en = ite.next();
+            String key = en.getKey();
+            String value = en.getValue();
+            targetMap.put(key,value);
+        }
+        }
+        return targetMap;
+    }
+
+
     public void execute(final RequestCall requestCall, Callback callback, LoadingCacheStringBean loadingCacheString)
     {
         if (debug)

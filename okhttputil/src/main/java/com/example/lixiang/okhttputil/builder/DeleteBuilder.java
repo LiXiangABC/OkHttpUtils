@@ -1,6 +1,7 @@
 package com.example.lixiang.okhttputil.builder;
 
 
+import com.example.lixiang.okhttputil.OkHttpUtils;
 import com.example.lixiang.okhttputil.request.DeleteRequest;
 import com.example.lixiang.okhttputil.request.RequestCall;
 
@@ -20,7 +21,7 @@ public class DeleteBuilder extends OkHttpRequestBuilder
             url = appendParams(url, params);
         }
 
-        return new DeleteRequest(url, tag, params, headers).build();
+        return new DeleteRequest(url, tag, OkHttpUtils.joinMap(params,OkHttpUtils.getCommonParams()) ,OkHttpUtils.joinMap(headers,OkHttpUtils.getCommonHeards()) ).build();
     }
 
     private String appendParams(String url, Map<String, String> params)

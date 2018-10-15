@@ -1,6 +1,7 @@
 package com.example.lixiang.okhttputil.builder;
 
 
+import com.example.lixiang.okhttputil.OkHttpUtils;
 import com.example.lixiang.okhttputil.request.GetRequest;
 import com.example.lixiang.okhttputil.request.RequestCall;
 
@@ -20,7 +21,7 @@ public class GetBuilder extends OkHttpRequestBuilder
             url = appendParams(url, params);
         }
 
-        return new GetRequest(url, tag, params, headers).build();
+        return new GetRequest(url, tag, OkHttpUtils.joinMap(params,OkHttpUtils.getCommonParams()) ,OkHttpUtils.joinMap(headers,OkHttpUtils.getCommonHeards()) ).build();
     }
 
     private String appendParams(String url, Map<String, String> params)

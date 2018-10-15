@@ -1,6 +1,7 @@
 package com.example.lixiang.okhttputil.builder;
 
 
+import com.example.lixiang.okhttputil.OkHttpUtils;
 import com.example.lixiang.okhttputil.request.PostFormRequest;
 import com.example.lixiang.okhttputil.request.RequestCall;
 import com.example.lixiang.quickcache.utils.FileUtil;
@@ -22,7 +23,7 @@ public class PostFormBuilder extends OkHttpRequestBuilder
 
     @Override
     public RequestCall build() {
-        return new PostFormRequest(url, tag, params, headers, files).build();
+        return new PostFormRequest(url, tag, OkHttpUtils.joinMap(params,OkHttpUtils.getCommonParams()) ,OkHttpUtils.joinMap(headers,OkHttpUtils.getCommonHeards()) , files).build();
     }
 
     public PostFormBuilder addFile(String name, String filename, File file)
@@ -118,6 +119,7 @@ public class PostFormBuilder extends OkHttpRequestBuilder
     public PostFormBuilder headers(Map<String, String> headers)
     {
         this.headers = headers;
+
         return this;
     }
 
