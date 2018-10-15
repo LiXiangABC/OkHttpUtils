@@ -24,6 +24,8 @@ import org.kymjs.kjframe.utils.PreferenceHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
@@ -108,10 +110,10 @@ public class OkHttpUtils
 
     public static GetBuilder get()
     {
-        return new GetBuilder().addHeader("ver","2.36");
+        return new GetBuilder().headers(heardsMap).params(paramsMap);
     }//当前指定为2.36版本
 
-    public static DeleteBuilder delete() {return new DeleteBuilder().addHeader("ver","2.36");}//当前指定为2.36版本
+    public static DeleteBuilder delete() {return new DeleteBuilder().headers(heardsMap).params(paramsMap);}//当前指定为2.36版本
 
     public static PostStringBuilder postString()
     {
@@ -125,10 +127,22 @@ public class OkHttpUtils
 
     public static PostFormBuilder post()
     {
-        return new PostFormBuilder().addHeader("ver","2.36");//当前指定为2.36版本
+        return new PostFormBuilder().headers(heardsMap).params(paramsMap);//当前指定为2.36版本
     }
 
+    public static Map<String, String> heardsMap;
+    public static Map<String, String> paramsMap;
+    /**        Explain : 设置公共请求头
+    * @author LiXiang create at 2018/10/15 11:51*/
+    public static void setCommonHeards(Map<String, String> heards){
+        heardsMap = heards;
+    }
 
+    /**        Explain : 设置公共请求参数
+    * @author LiXiang create at 2018/10/15 11:51*/
+    public static void setCommonParams(Map<String, String> params){
+        paramsMap = params;
+    }
     public void execute(final RequestCall requestCall, Callback callback, LoadingCacheStringBean loadingCacheString)
     {
         if (debug)
